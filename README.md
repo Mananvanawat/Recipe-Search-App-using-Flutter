@@ -1,6 +1,14 @@
 # recipe_app
 
-A new Flutter application.
+A new Flutter application with beautiful UI for searching recipes.
+
+Screenshots:-
+<br>
+<img src="images/1.jpeg" width=300px height=490px>
+<img src="images/2.jpeg" width=300px height=490px>
+<img src="images/3.jpeg" width=300px height=490px>
+<img src="images/4.jpeg" width=300px height=490px>
+
 
 ## Getting Started
 
