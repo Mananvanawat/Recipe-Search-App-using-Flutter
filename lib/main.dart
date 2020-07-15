@@ -36,29 +36,79 @@ class _MyHomePageState extends State<MyHomePage> {
   var searchedRecipe = "Paneer";
   final picker = ImagePicker();
   var path;
+  var food_list = [
+    "ice cream",
+    'ice lolly',
+    'French loaf',
+    'bagel',
+    'pretzel',
+    'cheeseburger',
+    'hotdog',
+    'mashed potato',
+    'head cabbage',
+    'broccoli',
+    'cauliflower',
+    'zucchini',
+    'spaghetti squash',
+    'acorn squash',
+    'butternut squash',
+    'cucumber',
+    'artichoke',
+    'bell pepper',
+    'cardoon',
+    'mushroom',
+    'Granny Smith',
+    'strawberry',
+    'orange',
+    'lemon',
+    'fig',
+    'pineapple',
+    'banana',
+    'jackfruit',
+    'custard apple'
+        'pomegranate'
+    'carbonara',
+    'chocolate sauce',
+    'dough',
+    'meat loaf',
+    'pizza',
+    'potpie',
+    'burrito',
+    'red wine',
+    'espresso',
+    'eggnog'
+  ];
 
   Future getImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.camera);
-     getResult(pickedFile.path);
-
-
+    getResult(pickedFile.path);
   }
-  var _controller = TextEditingController();
-  Future getResult(var path)async{
 
+  var _controller = TextEditingController();
+
+  Future getResult(var path) async {
     var recognitions = await Tflite.runModelOnImage(
-        path: path,   // required
-        imageMean: 127.5,   // defaults to 117.0
-        imageStd: 127.5,  // defaults to 1.0
-        numResults: 1,    // defaults to 5
-        threshold: 0.05,   // defaults to 0.1
-           // defaults to true
+      path: path,
+      // required
+      imageMean: 127.5,
+      // defaults to 117.0
+      imageStd: 127.5,
+      // defaults to 1.0
+      numResults: 1,
+      // defaults to 5
+      threshold: 0.05, // defaults to 0.1
+      // defaults to true
     );
-  print(recognitions);
-  setState(() {
-    searchedRecipe = recognitions[0]['label'];
-    _controller.text = recognitions[0]['label'];
-  });
+    print(recognitions);
+    for(var x in food_list){
+      if(x==recognitions[0]['label'])
+        setState(() {
+
+          searchedRecipe = recognitions[0]['label'];
+          _controller.text = recognitions[0]['label'];
+        });
+    }
+
   }
 
   Future getData(String query1) async {
@@ -70,22 +120,21 @@ class _MyHomePageState extends State<MyHomePage> {
     print(data1['hits'][0]);
     return data1;
   }
-   @override
-   void initState() {
+
+  @override
+  void initState() {
     // TODO: implement initState
     super.initState();
     Tflite.close();
     var res = Tflite.loadModel(
       labels: "assets/mobilenet_v1_1.0_224.txt",
       model: "assets/mobilenet_v1_1.0_224.tflite",
-
     );
     print(res);
-
   }
+
   @override
   Widget build(BuildContext context) {
-
     // TODO: implement build
     return Scaffold(
         appBar: AppBar(
@@ -113,7 +162,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         controller: _controller,
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
-                                icon: Icon(Icons.camera_alt,color: Colors.grey,), onPressed: getImage),
+                                icon: Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: getImage),
                             hintText: "Search",
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12))),
