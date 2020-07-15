@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'showPage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:tflite/tflite.dart';
 
 void main() => runApp(MyApp());
 
@@ -31,7 +33,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var searchedRecipe = "Banana";
+  var searchedRecipe = "Paneer";
+  final picker = ImagePicker();
+  var path;
+
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+     getResult(pickedFile.path);
+
+
+  }
+  var _controller = TextEditingController();
+  Future getResult(var path)async{
+
+    var recognitions = await Tflite.runModelOnImage(
+        path: path,   // required
+        imageMean: 127.5,   // defaults to 117.0
+        imageStd: 127.5,  // defaults to 1.0
+        numResults: 1,    // defaults to 5
+        threshold: 0.05,   // defaults to 0.1
+           // defaults to true
+    );
+  print(recognitions);
+  setState(() {
+    searchedRecipe = recognitions[0]['label'];
+    _controller.text = recognitions[0]['label'];
+  });
+  }
 
   Future getData(String query1) async {
     final query = query1;
@@ -42,17 +70,29 @@ class _MyHomePageState extends State<MyHomePage> {
     print(data1['hits'][0]);
     return data1;
   }
+   @override
+   void initState() {
+    // TODO: implement initState
+    super.initState();
+    Tflite.close();
+    var res = Tflite.loadModel(
+      labels: "assets/mobilenet_v1_1.0_224.txt",
+      model: "assets/mobilenet_v1_1.0_224.tflite",
 
+    );
+    print(res);
+
+  }
   @override
   Widget build(BuildContext context) {
-    var _controller = TextEditingController();
+
     // TODO: implement build
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
           title: Text(
             'RECIPES',
-            style: GoogleFonts.passionOne(color: Colors.black,fontSize: 30),
+            style: GoogleFonts.passionOne(color: Colors.black, fontSize: 30),
           ),
           elevation: 0,
         ),
@@ -73,12 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         controller: _controller,
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
-                                icon: Icon(Icons.search),
-                                onPressed: () {
-                                  setState(() {
-                                    searchedRecipe = searchedRecipe;
-                                  });
-                                }),
+                                icon: Icon(Icons.camera_alt,color: Colors.grey,), onPressed: getImage),
                             hintText: "Search",
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12))),
@@ -101,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       if (snapshot.data != null) {
                         var snapData = snapshot.data;
                         return ListView.builder(
-                          physics: BouncingScrollPhysics(),
+                            physics: BouncingScrollPhysics(),
                             itemCount: snapData['hits'].length > 10
                                 ? 10
                                 : snapData['hits'].length,
@@ -151,8 +186,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         snapData['hits'][index]
                                                                 ['recipe']
                                                             ['source'],
-                                                    style: GoogleFonts.indieFlower(
-                                                        fontSize: 20),
+                                                    style:
+                                                        GoogleFonts.indieFlower(
+                                                            fontSize: 20),
                                                   ),
                                                 ],
                                               ),
