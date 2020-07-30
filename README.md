@@ -1,6 +1,7 @@
 # recipe_app
 
 A new Flutter application with beautiful UI for searching recipes.
+Added a deep learning model compressed using Tensorflow lite that can detect fruits and food and search recipe of that. 
 
 Screenshots:-
 <br>
